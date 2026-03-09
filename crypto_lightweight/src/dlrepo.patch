@@ -1,0 +1,43 @@
+diff --git a/ascon/attack.mzn b/ascon/attack.mzn
+index 2c782a2..4b05117 100644
+--- a/ascon/attack.mzn
++++ b/ascon/attack.mzn
+@@ -352,10 +352,10 @@ solve minimize (PU + CM + CL);
+ % Ascon-AEAD
+ % ####################################################
+ % Difference can be in X[3] and X[4]
+-% Output mask should be zero in X[1], X[2], X[3], X[4]
++% Output mask should be zero in X[2], X[3], X[4]
+ 
+-% constraint forall(row in 0..2, column in 0..63)(xu[0, row, column] = 0);
+-% constraint forall(row in 1..4, column in 0..63)(xl[RL, row, column] = 0);
++constraint forall(row in 0..2, column in 0..63)(xu[0, row, column] = 0);
++constraint forall(row in 2..4, column in 0..63)(xl[RL, row, column] = 0);
+ % ####################################################
+ 
+ % Ascon-MAC
+@@ -379,6 +379,22 @@ solve minimize (PU + CM + CL);
+ % constraint yml[1, 0, 54] = 1;
+ % #############################################################################################################################################
+ 
++% #############################################################################################################################################
++% Artificial constraints to obtain a 4-round DL distinguisher with a specific target input/output difference in the first sbox layer
++constraint forall(row in 0..4, column in 1..63)(xu[0, row, column] = 0);  % LSBs all zero
++% Delta_i difference
++constraint xu[0, 0, 0] = 0;
++constraint xu[0, 1, 0] = 0;
++constraint xu[0, 2, 0] = 0;
++constraint xu[0, 3, 0] = 1;
++constraint xu[0, 4, 0] = 1;
++constraint forall(row in 0..4, column in 1..63)(yu[0, row, column] = 0);  % LSBs all zero
++% Delta_m difference
++constraint yu[0, 0, 0] = 1;
++constraint yu[0, 1, 0] = 0;
++constraint yu[0, 2, 0] = 0;
++constraint yu[0, 3, 0] = 0;
++constraint yu[0, 4, 0] = 0;
++% #############################################################################################################################################
++
+ % #############################################################################################################################################
+ % #############################################################################################################################################
+ % #############################################################################################################################################

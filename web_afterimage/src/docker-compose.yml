@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  afterimage-nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - afterimage-web
+    networks:
+      afterimage-net:
+        ipv4_address: 10.133.7.4
+
+  afterimage-web:
+    build: ./web
+    restart: unless-stopped
+    expose:
+      - 80
+    depends_on:
+      - afterimage-bot
+    networks:
+      afterimage-net:
+        ipv4_address: 10.133.7.3
+
+  afterimage-camera:
+    build: ./camera
+    restart: unless-stopped
+    environment:
+      FLAG: "srdnlen{s4me_0rig1n_is_b0ring_as_h3ll}"
+    depends_on:
+      - afterimage-nginx
+    networks:
+      afterimage-net:
+        ipv4_address: 10.133.7.5
+
+  afterimage-bot:
+    build:
+      context: ./bot
+      args:
+        - BROWSER=firefox
+    restart: unless-stopped
+    environment:
+      BROWSER: firefox
+      APPNAME: Victim
+      APPURL: http://afterimage.challs.srdnlen.it/
+      APPURLREGEX: ^http://afterimage-nginx/.*$
+      APPLIMIT: 2
+      APPLIMITTIME: 60
+      USE_PROXY: 1
+    dns: 8.8.8.8
+    networks:
+      afterimage-net:
+        ipv4_address: 10.133.7.2
+
+networks:
+  afterimage-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.133.7.0/24

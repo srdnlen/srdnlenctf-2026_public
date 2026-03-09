@@ -1,0 +1,32 @@
+services:
+  backend:
+    build: ./backend
+    container_name: backend
+    environment:
+      - APP_SECRET=Ise0pJTf40G$*pSzjPasfMu9
+      - FLAG=srdnlen{n0st4lg14_1s_4_vuln3r4b1l1ty_t00}
+    networks:
+      - internal_net
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    environment:
+      - BACKEND_HOST=backend
+      - BACKEND_PORT=5000
+      - PORT=80
+    networks:
+      - internal_net
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    environment:
+      - GATEWAY_URL=http://gateway
+    networks:
+      - internal_net
+    ports:
+      - "8000:80"
+
+networks:
+  internal_net:

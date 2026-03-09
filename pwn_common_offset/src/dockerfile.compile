@@ -1,0 +1,5 @@
+FROM ubuntu:25.10@sha256:4a9232cc47bf99defcc8860ef6222c99773330367fcecbf21ba2edb0b810a31e
+
+RUN apt-get clean
+RUN apt-get update
+RUN apt-get install -y build-essential=12.12ubuntu1

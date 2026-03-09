@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Double Shop</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span>Kety & Tom's</span>Portal
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-primary" id="viewReceipt">Download Receipt</button>
+    <button class="btn btn-secondary" id="returnChange">Refund</button>
+  </div>
+</header>
+
+<main>
+  <section class="card-box">
+    <h2 class="box-title">Inventory</h2>
+    <input id="search" class="search-field" placeholder="Search products...">
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <aside class="card-box">
+    <h2 class="box-title">Wallet & Actions</h2>
+    
+    <div class="balance-widget">
+      <span class="balance-label">Available Balance</span>
+      <span id="balance" class="balance-amount">$ 0</span>
+    </div>
+
+    <div class="coins-row">
+      <button class="coin-btn" data-amt="1">+1</button>
+      <button class="coin-btn" data-amt="5">+5</button>
+      <button class="coin-btn" data-amt="10">+10</button>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:24px">
+      <button class="btn btn-secondary" style="flex:1" id="restock">Refill</button>
+      <button class="btn btn-secondary" style="flex:1" id="clear">Clear</button>
+    </div>
+
+    <h3 style="font-size:13px; text-transform:uppercase; color:#9ca3af; margin-bottom:10px">History</h3>
+    <ul id="purchasedList" class="log-list">
+      <li style="padding:10px; text-align:center; color:#ccc; font-style:italic">No transactions yet</li>
+    </ul>
+  </aside>
+</main>
+
+<footer>
+  © 2026 Kety & Tom's. 
+</footer>
+
+<div class="toast" id="toast">Message</div>
+
+<script src="assets/vendor.js"></script>
+</body>
+</html>

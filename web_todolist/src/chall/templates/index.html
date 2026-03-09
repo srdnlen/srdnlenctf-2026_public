@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>My Todo List</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.8/dist/handlebars.min.js" crossorigin="anonymous"></script>
+<style>
+body { margin:0; font-family:system-ui,Arial,sans-serif; background:#10141b; color:#eef2f6; padding:1.1rem; display:flex; flex-direction:column; gap:1rem; }
+h1 { margin:.2rem 0 .8rem; font-size:1.2rem; letter-spacing:.5px; }
+section { background:#18212b; border:1px solid #243140; border-radius:10px; padding:1rem 1.05rem 1.15rem; display:flex; flex-direction:column; gap:.65rem; }
+label { font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; color:#92a2b5; font-weight:600; margin-bottom:.25rem; display:block; }
+textarea, input { width:100%; background:#101920; border:1px solid #25313d; border-radius:6px; padding:.55rem .7rem; color:#eef2f6; font:500 .8rem/1.35 ui-monospace,monospace; resize:vertical; }
+input { font:600 .85rem/1.3 system-ui,Arial,sans-serif; }
+textarea:focus, input:focus { outline:2px solid #3d82f6; }
+button { background:#3d82f6; border:none; color:#fff; font-size:.7rem; font-weight:600; letter-spacing:.5px; padding:.55rem .9rem; border-radius:6px; cursor:pointer; }
+button:disabled { opacity:.4; cursor:not-allowed; }
+small.helper { font-size:.6rem; color:#6d8094; line-height:1.25; }
+pre, code { font-family:ui-monospace,monospace; font-size:.68rem; }
+#rendered, #rawData { background:#0d141b; border:1px solid #1f2a36; padding:.6rem .7rem; border-radius:6px; white-space:pre-wrap; word-break:break-word; }
+.grid { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); align-items:start; }
+.status { font-size:.55rem; color:#7f92a7; display:flex; gap:1rem; flex-wrap:wrap; }
+.badge-warn { background:#3b2a1b; color:#ffb347; padding:.25rem .55rem; border-radius:999px; font-size:.55rem; letter-spacing:.06em; font-weight:600; }
+.inline { background:#1e2a34; padding:.15rem .35rem; border-radius:4px; }
+hr { border:none; border-top:1px solid #22303d; margin:.5rem 0; }
+.actions { display:flex; gap:.5rem; flex-wrap:wrap; }
+.note { font-size:.55rem; color:#d79e5b; }
+.todo-list { display:flex; flex-direction:column; gap:.55rem; margin-top:.3rem; }
+.todo-card { background:#121d26; border:1px solid #243140; border-radius:8px; padding:.6rem .7rem; display:flex; flex-direction:column; gap:.4rem; }
+.todo-head { display:flex; justify-content:space-between; align-items:center; gap:.6rem; }
+.todo-head h4 { margin:0; font-size:.75rem; font-weight:600; letter-spacing:.4px; }
+.todo-head button { background:#e55353; padding:.25rem .55rem; font-size:.55rem; }
+.todo-out { font:500 .65rem/1.3 ui-monospace,monospace; white-space:pre-wrap; word-break:break-word; color:#d6e2ea; }
+.badge-time { font-size:.48rem; color:#7f92a7; letter-spacing:.05em; }
+#todosSection { position:relative; overflow:hidden; padding-top:2.2rem; }
+#todosSection .hero {
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 35%,rgba(80,140,255,.18),transparent 60%),
+    radial-gradient(circle at 82% 30%,rgba(255,90,160,.15),transparent 65%),
+    linear-gradient(140deg,#1b2835,#121b24 55%);
+  opacity:.9;
+}
+#todosSection .wave {
+  position:absolute; top:0; left:0; width:100%; height:70px; mix-blend-mode:overlay; opacity:.55;
+}
+#todosHeader {
+  position:relative; display:flex; align-items:center; justify-content:space-between;
+  margin:-1.2rem -1.05rem 0; padding:1rem 1.2rem .65rem;
+  background:linear-gradient(125deg,#25384a,#1b2733 60%,#18212b);
+  border-bottom:1px solid #22313f;
+}
+#todosHeader h2 { margin:0; font-size:.85rem; letter-spacing:.12em; text-transform:uppercase; font-weight:700; }
+#todosCount {
+  background:linear-gradient(90deg,#3d82f6,#6d5ef6);
+  padding:.3rem .65rem; border-radius:999px; font-size:.55rem; font-weight:600; letter-spacing:.07em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 2px 6px -2px rgba(0,0,0,.6);
+}
+.todo-list { /* replaced earlier for top section visuals */ display:flex; flex-direction:column; gap:.6rem; margin-top:.6rem; position:relative; }
+.todo-card {
+  background:linear-gradient(155deg,#16212b,#121c24);
+  border:1px solid #243140; border-radius:12px; padding:.7rem .75rem .65rem .9rem;
+  display:flex; flex-direction:column; gap:.45rem; position:relative;
+  overflow:hidden;
+  transition:border-color .25s, transform .25s, background .4s;
+}
+.todo-card::before {
+  content:""; position:absolute; inset:0;
+  background:
+    linear-gradient(120deg,rgba(70,130,255,.18),transparent 40%),
+    linear-gradient(-55deg,rgba(255,90,160,.15),transparent 65%);
+  opacity:.55; pointer-events:none;
+}
+.todo-card::after {
+  content:""; position:absolute; top:0; left:0; bottom:0; width:4px;
+  background:linear-gradient(180deg,#3d82f6,#9c5bff); border-top-left-radius:12px; border-bottom-left-radius:12px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.07), 0 0 12px -2px #3d82f6cc;
+}
+.todo-card:hover { border-color:#3d82f6; transform:translateY(-2px); }
+.todo-head h4 { font-size:.78rem; letter-spacing:.4px; }
+.todo-head button { background:#e55353; padding:.28rem .6rem; font-size:.55rem; }
+.todo-out { font:500 .64rem/1.3 ui-monospace,monospace; white-space:pre-wrap; word-break:break-word; color:#d6e2ea; }
+.badge-time { font-size:.49rem; color:#7f92a7; letter-spacing:.05em; }
+#rendered { border-radius:10px; background:
+  linear-gradient(145deg,#13202a,#121c25 60%),
+  radial-gradient(circle at 85% 20%,rgba(255,90,160,.18),transparent 60%),
+  radial-gradient(circle at 15% 75%,rgba(70,130,255,.22),transparent 65%);
+  border:1px solid #243140;
+}
+/* Compact adjustments since list moved up */
+section.compact { margin-top:-.2rem; }
+</style>
+</head>
+<body>
+<h1>My Todo List</h1>
+
+<section id="todosSection">
+  <div class="hero"></div>
+  <svg class="wave" viewBox="0 0 1200 120" preserveAspectRatio="none">
+    <path d="M0,0 C300,90 900,-40 1200,60 L1200,0 L0,0 Z" fill="rgba(255,255,255,0.04)"></path>
+  </svg>
+  <div id="todosHeader">
+    <h2>Todos</h2>
+    <span id="todosCount">0</span>
+  </div>
+  <div id="todosList" class="todo-list"></div>
+  <small class="helper" id="todosEmpty" style="display:none; position:relative;">No todos yet. Create one below.</small>
+</section>
+
+<section class="compact">
+  <label for="shared">Data</label>
+  <textarea id="shared" rows="8" spellcheck="false" placeholder='{"user":{"name":"Alice"},"tasks":[{"t":"Example"}]}'></textarea>
+  <small class="helper">
+    Root context for the todo template. Example: <code class="inline">{{user.name}}</code>,
+    iterate: <code class="inline">{{#each tasks}}{{this.t}}{{/each}}</code>.
+  </small>
+  <div id="sharedErr" style="color:#e55353;font-size:.6rem;font-weight:600;"></div>
+</section>
+
+
+<section class="compact">
+  <label for="title">Todo Title</label>
+  <input id="title" type="text" maxlength="120" placeholder="e.g. Daily Summary" />
+  <label for="template">Todo Template</label>
+  <textarea id="template" rows="6" spellcheck="false" placeholder="Hello {{user.name}}!&#10;{{#each tasks}}- {{this.t}}&#10;{{/each}}"></textarea>
+  <div id="tplErr" style="color:#e55353;font-size:.6rem;font-weight:600;"></div>
+  <div class="actions">
+    <button id="saveBtn">Add</button>
+    <button id="resetBtn" type="button">Reset</button>
+    <button id="saveToCookieBtn" type="button">Save to Cookie</button>
+  </div>
+</section>
+
+<section class="compact">
+  <label>Todo Preview</label>
+  <div id="renderContainer" style="min-height:80px;opacity:.7;">(preview)</div>
+  <div class="status">
+    <span id="lastSaved">Last Saved: -</span>
+    <span id="cookieSize">Cookie Size: 0B</span>
+  </div>
+</section>
+
+<script>
+const COOKIE_NAME = 'simplifiedTodoData';
+const saveBtn = document.getElementById('saveBtn');
+const resetBtn = document.getElementById('resetBtn');
+const saveToCookieBtn = document.getElementById('saveToCookieBtn');
+const sharedEl = document.getElementById('shared');
+const titleEl = document.getElementById('title');
+const templateEl = document.getElementById('template');
+const renderContainer = document.getElementById('renderContainer');
+const sharedErrEl = document.getElementById('sharedErr');
+const tplErrEl = document.getElementById('tplErr');
+const lastSavedEl = document.getElementById('lastSaved');
+const cookieSizeEl = document.getElementById('cookieSize');
+const todosListEl = document.getElementById('todosList');
+const todosEmptyEl = document.getElementById('todosEmpty');
+const todosCountEl = document.getElementById('todosCount');
+
+Handlebars.registerHelper('json', v => {
+  try { return JSON.stringify(v,null,2);} catch(e){ return ''; }
+});
+
+Handlebars.registerHelper('eq', (a, b) => a === b);
+
+function toB64(str){
+  try { return btoa(String.fromCharCode(...new TextEncoder().encode(str))); } catch(e){ return ''; }
+}
+function fromB64(b64){
+  try { return new TextDecoder().decode(Uint8Array.from(atob(b64), c=>c.charCodeAt(0))); } catch(e){ return null; }
+}
+
+function readCookie(name){
+  return document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith(name+'='))?.split('=').slice(1).join('=') || null;
+}
+
+function writeCookie(name, value){
+  const expires = new Date(Date.now()+ 1000*60*60*24*30).toUTCString();
+  document.cookie = `${name}=${value}; Expires=${expires}; Path=/;SameSite=None;Secure;`;
+  updateCookieSize();
+}
+
+function updateCookieSize(){
+  const raw = document.cookie;
+  cookieSizeEl.textContent = 'Cookie Size: ' + raw.length + 'B';
+}
+
+function defaultModel(){
+  return {
+    shared:{ user:{ name:"Alice"}, tasks:[{ t:"Example Task"}]},
+    draft:{ title:"Sample", template:"Hello {{user.name}}\\n{{#each tasks}}- {{this.t}}\\n{{/each}}" },
+    todos:[
+      {
+        id: genId(),
+        title:"Sample",
+        template:"Hello {{user.name}}\\n{{#each tasks}}- {{this.t}}\\n{{/each}}",
+        createdAt:new Date().toISOString()
+      }
+    ],
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function genId(){ return 't_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+
+function deepMerge(target, source){
+  if(!source || typeof source!=='object') return target;
+  for(const k in source){
+    if(!source.hasOwnProperty(k)) continue;
+    const sv = source[k], tv = target[k];
+    if(sv && typeof sv === 'object' && !Array.isArray(sv) && tv && typeof tv === 'object' && !Array.isArray(tv)){
+      deepMerge(tv, sv);
+    } else {
+      target[k] = sv;
+    }
+  }
+  return target;
+}
+
+function applyQueryParams(model){
+  try {
+    const qp = new URLSearchParams(location.search);
+    let changed = false;
+
+    if(qp.has('data')){
+      try {
+        const parsed = JSON.parse(qp.get('data'), (k, v) => k === '__proto__' ? void 0 : v);
+        if(parsed && typeof parsed === 'object'){
+          model.shared = deepMerge(model.shared || {}, parsed);
+          changed = true;
+        }
+      } catch(e){ console.warn('Invalid data param JSON', e); }
+    }
+
+    let templateProvided = false;
+    if(qp.has('template')){
+      const t = qp.get('template');
+      if(typeof t === 'string'){
+        model.draft.template = t;
+        templateProvided = true;
+        changed = true;
+      }
+    }
+
+    if(qp.has('title')){
+      const ttl = qp.get('title') || 'untitled';
+      model.draft.title = ttl;
+      changed = true;
+    } else if (templateProvided){
+      model.draft.title = 'untitled';
+      changed = true;
+    }
+
+    return changed;
+  } catch(e){
+    return false;
+  }
+}
+
+let model = loadModel();
+
+const queryModified = applyQueryParams(model);
+
+applyModelToUI();
+if(queryModified){
+  document.getElementById('template').value = model.draft.template;
+}
+renderAll();
+renderTodosList();
+updateCookieSize();
+
+if(queryModified && history.replaceState){
+  const url = new URL(location.href);
+  url.search = '';
+  history.replaceState(null,'',url.toString());
+}
+
+function loadModel(){
+  try{
+    const c = readCookie(COOKIE_NAME);
+    if(!c) return defaultModel();
+    let decoded = fromB64(c);
+    if(!decoded){
+      try { decoded = decodeURIComponent(c); } catch(_) {}
+    }
+    if(!decoded) return defaultModel();
+    const m = JSON.parse(decoded);
+
+    if(!m.todos){
+      m.todos = m.todo ? [ { id: genId(), title:m.todo.title||'Untitled', template:m.todo.template||'', createdAt: m.updatedAt || new Date().toISOString() } ] : [];
+      m.draft = { title: (m.todo && m.todo.title) || 'Draft', template: (m.todo && m.todo.template) || '' };
+      delete m.todo;
+    }
+    if(!m.draft){
+      m.draft = { title:'', template:'' };
+    }
+    return m;
+  }catch(e){
+    return defaultModel();
+  }
+}
+
+function persist(){
+  model.updatedAt = new Date().toISOString();
+  const json = JSON.stringify(model);
+  try {
+    writeCookie(COOKIE_NAME, toB64(json));
+    lastSavedEl.textContent = 'Last Saved: ' + new Date(model.updatedAt).toLocaleTimeString();
+  } catch(e){
+    lastSavedEl.textContent = 'Save Failed';
+  }
+}
+
+function applyModelToUI(){
+  sharedEl.value = JSON.stringify(model.shared, null, 2);
+  titleEl.value = model.draft.title;
+  templateEl.value = model.draft.template;
+  lastSavedEl.textContent = 'Last Saved: ' + new Date(model.updatedAt).toLocaleTimeString();
+}
+
+function renderTodosList(){
+  todosListEl.innerHTML='';
+  const arr = model.todos || [];
+  todosEmptyEl.style.display = arr.length ? 'none':'block';
+  todosCountEl.textContent = arr.length;
+  arr.forEach(t=>{
+    const out = renderTodoOutput(t);
+    const div = document.createElement('div');
+    div.className='todo-card';
+    div.innerHTML = `
+      <div class="todo-head">
+        <h4>${escapeHtml(t.title || 'Untitled')}</h4>
+        <button data-del="${t.id}" title="Delete">Del</button>
+      </div>
+      <div class="badge-time">${new Date(t.createdAt).toLocaleString()}</div>
+      <pre class="todo-out">${escapeHtml(out)}</pre>
+    `;
+    todosListEl.appendChild(div);
+  });
+  todosListEl.querySelectorAll('button[data-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-del');
+      model.todos = model.todos.filter(x=>x.id!==id);
+      renderTodosList();
+      updateCookieSize();
+    });
+  });
+}
+
+function renderTodoOutput(todo){
+  try{
+    const tmpl = Handlebars.compile(todo.template||'');
+    return tmpl(model.shared);
+  }catch(e){
+    return '[error] '+e.message;
+  }
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+function safeParseShared(){
+  sharedErrEl.textContent = '';
+  try {
+    const obj = JSON.parse(sharedEl.value || '{}');
+    model.shared = obj;
+    return true;
+  } catch(e){
+    sharedErrEl.textContent = 'Shared JSON invalid: ' + e.message;
+    return false;
+  }
+}
+
+async function compileCurrent(){
+  tplErrEl.textContent = '';
+  try {
+    const tmpl = await Handlebars.compile(templateEl.value || '');
+    return tmpl(model.shared);
+  } catch(e){
+    tplErrEl.textContent = e.message;
+    return null;
+  }
+}
+
+async function renderAll(){
+  if(!safeParseShared()){
+    removeRenderedSummary();
+    renderContainer.textContent='(shared JSON invalid)';
+    renderContainer.style.opacity=.5;
+    return;
+  }
+  const out = await compileCurrent();
+  if(out===null){
+    removeRenderedSummary();
+    renderContainer.textContent='(template error)';
+    renderContainer.style.opacity=.5;
+  } else {
+    const display = out.trim() ? out : '(empty output)';
+    createRenderedSummary(display);
+    renderContainer.style.opacity=1;
+  }
+}
+
+function removeRenderedSummary(){
+  const existing = document.getElementById('rendered');
+  if(existing) existing.remove();
+}
+
+function createRenderedSummary(text){
+  removeRenderedSummary();
+  renderContainer.innerHTML = '';
+  const summ = document.createElement('summary');
+  summ.id = 'rendered';
+  summ.textContent = text;
+  summ.tabIndex = 0;
+  renderContainer.appendChild(summ);
+  return summ;
+}
+
+sharedEl.addEventListener('input', ()=>{ renderAll(); autoSave(); });
+templateEl.addEventListener('input', ()=>{ renderAll(); model.draft.template = templateEl.value; autoSave(); });
+titleEl.addEventListener('input', ()=>{ model.draft.title = titleEl.value.trim(); autoSave(); });
+
+saveBtn.addEventListener('click', ()=> {
+  if(!safeParseShared()) return;
+  model.draft.title = titleEl.value.trim();
+  model.draft.template = templateEl.value;
+
+  model.todos.unshift({
+    id: genId(),
+    title: model.draft.title || 'Untitled',
+    template: model.draft.template,
+    createdAt: new Date().toISOString()
+  });
+  renderTodosList();
+  updateCookieSize();
+});
+
+resetBtn.addEventListener('click', ()=>{
+  model.draft = { title:'', template:'' };
+  titleEl.value='';
+  templateEl.value='';
+  renderAll();
+});
+
+let saveDebounce;
+function autoSave(){
+  clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(()=>{
+    if(!sharedErrEl.textContent && !tplErrEl.textContent){
+      renderTodosList();
+    }
+  },600);
+}
+
+saveToCookieBtn.addEventListener('click', ()=> {
+  try {
+    persist();
+    updateCookieSize();
+  } catch(e){
+      alert('Failed to save to cookie: ' + e.message);
+  }
+});
+
+renderTodosList();
+</script>
+</body>
+</html>

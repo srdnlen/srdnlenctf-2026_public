@@ -1,0 +1,3 @@
+x86_64-w64-mingw32-g++ chall.cpp -o chall.exe -static -s -O2 -m64
+
+x86_64-w64-mingw32-g++ flag_calc.cpp -o flag.exe -static -O2 -m64 -lgdi32

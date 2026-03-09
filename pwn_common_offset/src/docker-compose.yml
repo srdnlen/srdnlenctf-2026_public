@@ -1,0 +1,6 @@
+services:
+  common-offset:
+    build: .
+    ports:
+      - "1089:1089"
+    restart: unless-stopped

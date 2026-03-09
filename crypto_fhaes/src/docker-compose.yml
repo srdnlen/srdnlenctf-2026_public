@@ -1,0 +1,9 @@
+services:
+  fhaes:
+    build: .
+    image: fhaes
+    privileged: true
+    ports:
+      - "12345:1337"
+    environment:
+      - FLAG=srdnlen{this_is_a_fake_flag}

@@ -1,0 +1,6 @@
+services:
+  registered-stack:
+    build: .
+    ports:
+      - "1090:1089"
+    restart: unless-stopped

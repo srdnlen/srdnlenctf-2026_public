@@ -1,0 +1,6 @@
+services:
+  echo:
+    build: .
+    ports:
+      - "1091:1089"
+    restart: unless-stopped

@@ -1,0 +1,10 @@
+x86_64-w64-mingw32-g++ \
+    -o malware.exe \
+    malware.c++ \
+    -lwininet \
+    -static \
+    -s \
+    -static-libgcc \
+    -static-libstdc++
+
+x86_64-w64-mingw32-g++   -s  -shared     -o payload.dll     payload.c++   -static  -s    -static-libgcc -static-libstdc++

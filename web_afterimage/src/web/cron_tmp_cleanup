@@ -1,0 +1,3 @@
+# delete all tmp files every 15 mins, that are older than 5 minutes and are not php sessions files
+# this is not included in the attachment
+*/15 * * * * find /tmp -type f -not -name "sess_*" -mmin +5 -delete

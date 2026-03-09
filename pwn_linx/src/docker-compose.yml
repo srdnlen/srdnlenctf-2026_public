@@ -1,0 +1,9 @@
+services:
+  linx:
+    build: .
+    image: pwn-linx
+    privileged: true
+    ports:
+      - "1092:1092"
+    environment:
+      - FLAG=srdnlen{this_is_a_fake_flag}

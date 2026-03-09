@@ -1,0 +1,19 @@
+version: '3'
+services:
+  # UNICO BACKEND
+  tomcat-backend:
+    build: ./tomcat
+    container_name: shop-backend
+    restart: always
+    environment:
+      # necessario per il bypass: permette a Tomcat di processare percorsi manipolati (;)
+      - CATALINA_OPTS=-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Dorg.apache.tomcat.util.http.parser.HttpParser.requestTargetAllow="{}[]|\\^&#x60;" -Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true
+
+  # FRONTEND PROXY
+  apache-frontend:
+    build: ./apache
+    container_name: shop-frontend
+    ports:
+      - "1337:80"
+    depends_on:
+      - tomcat-backend

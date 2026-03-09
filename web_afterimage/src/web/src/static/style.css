@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg-deep: #F2F0E9;
+    --text-main: #1a1918;
+    --text-muted: #5c5a56;
+    --accent-1: #ff3300;
+    --accent-2: #0044ff;
+    --glass-bg: rgba(240, 238, 232, 0.65);
+    --glass-border: rgba(26, 25, 24, 0.1);
+    --input-bg: rgba(255, 255, 255, 0.5);
+    --input-border: #d1cfc7;
+    --shadow-soft: 0 2px 0 rgba(26, 25, 24, 0.05);
+    --shadow-strong: 0 4px 0 rgba(26, 25, 24, 0.1), 0 8px 20px rgba(0,0,0,0.05);
+    --radius: 6px;
+}
+
+body.dark {
+    --bg-deep: #111110;
+    --text-main: #e6e4dc;
+    --text-muted: #8a8885;
+    --accent-1: #ff4d00;
+    --accent-2: #3388ff;
+    --glass-bg: rgba(25, 25, 25, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --input-bg: rgba(0, 0, 0, 0.3);
+    --input-border: rgba(255, 255, 255, 0.15);
+    --shadow-soft: 0 4px 12px rgba(0,0,0,0.5);
+    --shadow-strong: 0 0 0 1px #333, 0 20px 40px rgba(0,0,0,0.8);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-main);
+    background-color: var(--bg-deep);
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at center, transparent 30%, var(--bg-deep) 100%);
+    opacity: 0.5;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.navbar {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.brand {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    text-decoration: none;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    border-bottom: 3px solid var(--accent-1);
+    padding-bottom: 2px;
+}
+
+.nav-links a {
+    margin-left: 24px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: var(--text-main);
+}
+
+.container {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 0 24px;
+    display: grid;
+    gap: 32px;
+}
+
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-strong);
+    border-color: var(--text-muted);
+}
+
+h1, h2, h3 {
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    margin-top: 0;
+    letter-spacing: -0.04em;
+}
+
+h2 { font-size: 1.35rem; }
+
+p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius);
+    color: var(--text-main);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--text-main);
+    background: var(--glass-bg);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+button {
+    background: var(--text-main);
+    color: var(--bg-deep);
+    padding: 12px 20px;
+    border: 1px solid var(--text-main);
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+}
+
+body.dark button {
+    background: var(--text-main);
+    color: #111;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.alert {
+    background: transparent;
+    color: var(--accent-1);
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--accent-1);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    text-align: center;
+    background-image: linear-gradient(45deg, rgba(255, 51, 0, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 51, 0, 0.05) 50%, rgba(255, 51, 0, 0.05) 75%, transparent 75%, transparent);
+    background-size: 10px 10px;
+}
+
+.token-box {
+    display: flex;
+}
+
+.token-box input {
+    margin-bottom: 0;
+    background: var(--input-bg);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}
+
+.token-box button {
+    width: auto;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--input-border);
+    border-left: 1px solid var(--input-border);
+    box-shadow: none;
+}
+
+.token-box button:last-child {
+    border-top-right-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+}
+
+.token-box button:hover {
+    background: var(--text-main);
+    color: var(--bg-deep);
+    z-index: 1;
+}
+
+.token-box button[style*="color: #e53e3e"] {
+    color: var(--accent-1) !important;
+}
+
+.token-box button[style*="color: #e53e3e"]:hover {
+    background: var(--accent-1) !important;
+    color: white !important;
+    border-color: var(--accent-1) !important;
+}

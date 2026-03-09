@@ -1,0 +1,6 @@
+services:
+  cornflake:
+    build: .
+    image: cornflake
+    ports:
+      - "8000:8000"

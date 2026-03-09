@@ -1,0 +1,10 @@
+services:
+  emoji:
+    build: .
+    container_name: "Emoji-Captcha"
+    ports:
+      - "0.0.0.0:1717:1717"
+    restart: unless-stopped
+    environment:
+      - FLAG=srdnlen{0P3nCV_1S_f4St3R_tH4n_Y0uR_3y3S_36E19205F8AFDE9D}
+      - SAMPLE_SEED=3de0ac646fb1aa1f048080cc9e82f1fa

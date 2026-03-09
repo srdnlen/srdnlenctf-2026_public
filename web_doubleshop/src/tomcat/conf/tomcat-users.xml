@@ -1,0 +1,6 @@
+<tomcat-users xmlns="http://tomcat.apache.org/xml/tomcat-users.xsd" version="1.0">
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  
+  <user username="adm1n" password="317014774e3e85626bd2fa9c5046142c" roles="manager-gui"/>
+</tomcat-users>

